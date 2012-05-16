@@ -1,3 +1,6 @@
+### Author : Francesco Cervigni
+### Date : May 2012
+
 # Compiling the server
 CCPP=g++
 CPP_FLAGS= -I/Users/showandtell/boost_1_49_0 -I../includes -DJSON_IS_AMALGAMATION -g
