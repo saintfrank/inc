@@ -9,10 +9,17 @@ CPP_LINK_OPT= -L/Users/showandtell/boost_1_49_0/lib -lboost_system -lboost_threa
 # relative output for the Scala code
 SCALA_BUILD_PATH ?= build/
 
-programs = ftk_server ftk_console
+programs = prova
+#programs = ftk_server ftk_console
 
 
 all: $(programs)
+
+prova: prova.o jsoncpp.o	
+	$(CCPP) $(CPP_LINK_OPT) prova.o jsoncpp.o -o prova
+
+prova.o: prova.cxx
+	$(CCPP) $(CPP_FLAGS) -c prova.cxx 
 
 ftk_server: RemoteConnector.o RemoteThread.o jsoncpp.o initializer.o	
 	$(CCPP) $(CPP_LINK_OPT) RemoteConnector.o RemoteThread.o jsoncpp.o initializer.o -o ftk_server
