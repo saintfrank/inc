@@ -4,7 +4,7 @@
 # Compiling the server
 CCPP=g++
 CPP_FLAGS= -I/Users/showandtell/boost_1_49_0 -I../includes -DJSON_IS_AMALGAMATION -g
-CPP_LINK_OPT= -L/Users/showandtell/boost_1_49_0/lib -lboost_system -lboost_thread -lboost_date_time
+CPP_LINK_OPT=-lboost_system -lboost_thread -lboost_date_time
 
 # relative output for the Scala code
 SCALA_BUILD_PATH ?= build/
