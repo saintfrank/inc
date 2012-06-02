@@ -134,15 +134,36 @@ int main(int argc, char* argv[]) {
 	try {
 
 		if (argc != 3) {
-			std::cout << "Usage: async_client <server> <path>\n";
+			std::cout << "Usage: sync_client <server> <path>\n";
 			std::cout << "Example:\n";
-			std::cout << "  async_client www.boost.org /LICENSE_1_0.txt\n";
+			std::cout << "  sync_client www.boost.org /LICENSE_1_0.txt\n";
 			return 1;
 		}
 
 		boost::asio::io_service io_service;
-		client c(io_service, argv[1], argv[2]);
-		io_service.run();
+
+		// Get a list of endpoints corresponding to the server name.
+		tcp::resolver resolver(io_service);
+		tcp::resolver::query query(argv[1], "http");
+		tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
+
+		// Try each endpoint until we successfully establish a connection.
+		tcp::socket socket(io_service);
+		boost::asio::connect(socket, endpoint_iterator);
+
+		// Form the request. We specify the "Connection: close" header so that the
+		// server will close the socket after transmitting the response. This will
+		// allow us to treat all data up until the EOF as the content.
+		boost::asio::streambuf request;
+		std::ostream request_stream(&request);
+		request_stream << "CIAO \n" ;
+
+		// Send the request.
+		boost::asio::write(socket, request);
+
+
+
+
 	} catch (std::exception& e) {
 		std::cout << "Exception: " << e.what() << "\n";
 	}

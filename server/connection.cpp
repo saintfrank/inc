@@ -16,22 +16,17 @@
 #include "request_handler.hpp"
 
 
-
 namespace http {
 namespace server3 {
 
-connection::connection(boost::asio::io_service& io_service) :
-		strand_(io_service), socket_(io_service){
-}
+connection::connection( boost::asio::io_service& io_service ) : strand_(io_service), socket_(io_service){ }
 
-boost::asio::ip::tcp::socket& connection::socket() {
-	return socket_;
-}
+boost::asio::ip::tcp::socket& connection::socket() { return socket_; }
 
 void connection::start() {
 
 
-	std::cout << "Reading ... !\n";
+	std::cout << "Reading ... \n";
 
 	socket_.async_read_some(
 
@@ -50,19 +45,13 @@ void connection::handle_read( const boost::system::error_code& e, std::size_t by
 
 	if (!e) {
 
-		//boost::tribool result;
-
-		//boost::tie(result, boost::tuples::ignore) = request_parser_.parse(
-		//		request_, buffer_.data(), buffer_.data() + bytes_transferred);
-
-
+			std::cout << "Received " <<  buffer_.data() << " !\n";
 
 			std::stringstream prova;
 
-			std::cout << "Now received " <<  buffer_.data() << " !\n";
-
 			prova << buffer_.data() << buffer_.data();
 
+			std::cout << "Sending " <<  prova.str() << " !\n";
 
 
 			boost::asio::async_write(
@@ -78,20 +67,29 @@ void connection::handle_read( const boost::system::error_code& e, std::size_t by
 									);
 
 
-			handle_read( e, bytes_transferred );
-
-		//}else
-		//	std::cerr << "ERRORE !!!" ;
-
 	}
 
-	// If an error occurs then no new asynchronous operations are started. This
-	// means that all shared_ptr references to the connection object will
-	// disappear and the object will be destroyed automatically after this
-	// handler returns. The connection class's destructor closes the socket.
 }
 
 void connection::handle_write(const boost::system::error_code& e) {
+
+	std::cout << "Reading ... \n";
+
+	socket_.async_read_some(
+
+			boost::asio::buffer(buffer_),
+			strand_.wrap(
+							boost::bind (
+											&connection::handle_read, shared_from_this(),
+											boost::asio::placeholders::error,
+											boost::asio::placeholders::bytes_transferred
+										)
+						)
+			);
+}
+
+
+void connection::close(const boost::system::error_code& e) {
 	if (!e) {
 		// Initiate graceful connection closure.
 		boost::system::error_code ignored_ec;
@@ -99,10 +97,6 @@ void connection::handle_write(const boost::system::error_code& e) {
 				ignored_ec);
 	}
 
-	// No new asynchronous operations are started. This means that all shared_ptr
-	// references to the connection object will disappear and the object will be
-	// destroyed automatically after this handler returns. The connection class's
-	// destructor closes the socket.
 }
 
 } // namespace server3
