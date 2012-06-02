@@ -27,9 +27,7 @@ public:
 		// allow us to treat all data up until the EOF as the content.
 		std::ostream request_stream(&request_);
 		request_stream << "CIAO " << path << " HTTP/1.0\r\n";
-		request_stream << "Host: " << server << "\r\n";
-		request_stream << "Accept: */*\r\n";
-		request_stream << "Connection: close\r\n\r\n";
+
 
 		// Start an asynchronous resolve to translate the server and service names
 		// into a list of endpoints.
