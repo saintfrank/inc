@@ -15,19 +15,21 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 
+#define MAXBUF 1024
+
 using boost::asio::ip::tcp;
 
 class client {
 public:
-	client(boost::asio::io_service& io_service, const std::string& server,
-			const std::string& path) :
+	client(boost::asio::io_service& io_service, const std::string& server, const std::string& path) :
 			resolver_(io_service), socket_(io_service) {
+
+
 		// Form the request. We specify the "Connection: close" header so that the
 		// server will close the socket after transmitting the response. This will
 		// allow us to treat all data up until the EOF as the content.
 		std::ostream request_stream(&request_);
-		request_stream << "CIAO " << path << " HTTP/1.0\r\n";
-
+		request_stream << "CIAO \n";
 
 		// Start an asynchronous resolve to translate the server and service names
 		// into a list of endpoints.
@@ -40,8 +42,10 @@ public:
 	}
 
 private:
-	void handle_resolve(const boost::system::error_code& err,
-			tcp::resolver::iterator endpoint_iterator) {
+
+
+	void handle_resolve(const boost::system::error_code& err, tcp::resolver::iterator endpoint_iterator) {
+
 		if (!err) {
 			// Attempt a connection to each endpoint in the list until we
 			// successfully establish a connection.
@@ -61,7 +65,7 @@ private:
 			boost::asio::async_write(
 					socket_,
 					request_,
-					boost::bind(&client::handle_write_request, this,
+					boost::bind(&client::handle_read_content, this,
 							boost::asio::placeholders::error));
 
 			std::cout << "fatta la seconda write !!";
@@ -71,48 +75,48 @@ private:
 		}
 	}
 
-	void handle_write_request(const boost::system::error_code& err) {
-		if (!err) {
-			// Read the response status line. The response_ streambuf will
-			// automatically grow to accommodate the entire line. The growth may be
-			// limited by passing a maximum size to the streambuf constructor.
-			boost::asio::async_read_until(
-					socket_,
-					response_,
-					"\r\n",
-					boost::bind(&client::handle_read_content, this,
-							boost::asio::placeholders::error));
-		} else {
-			std::cout << "Error: " << err.message() << "\n";
-		}
-	}
-
-
-
 	void handle_read_content(const boost::system::error_code& err) {
 		if (!err) {
 			// Write all of the data that has been read so far.
+			std::string myInput(MAXBUF, 'b');
 
+			//routine
+			while (true) {
 
-				std::cout << &response_;
+				int readed;
+				std::string readed_string;
 
-				// Continue reading remaining data until EOF.
-				boost::asio::async_read(
+				try {
+					boost::array<char, MAXBUF> myBuf = { { ' ' } };
 
-						socket_, response_,
-						boost::asio::transfer_at_least(1),
-						boost::bind(&client::handle_read_content, this,
-						boost::asio::placeholders::error)
+					readed = socket_.read_some(boost::asio::buffer(myBuf));
 
-						);
+					if (readed > 0)
+						readed_string.append(std::string(myBuf.data()));
 
-				std::cout << "> " << std::endl;
-				std::string ciao;
-				std::getline(std::cin, ciao );
+					std::cout
+							<< "Console: I have received a partial response, now is: "
+							<< readed_string << std::endl;
 
-				handle_connect( err );
+				} catch (boost::system::system_error) {
+					std::cerr << "Console: Error on reading socket " << readed
+							<< " bytes" << std::endl;
+				}
 
+				std::cout << "> ";
+				std::getline(std::cin, myInput);
 
+				if (myInput.compare("exit") != 0
+						&& myInput.compare("quit") != 0) {
+
+					boost::asio::write(socket_, boost::asio::buffer(myInput));
+
+				} else {
+					std::cout
+							<< "\n---------- ftkconsole terminating ------------ \n\n";
+					break; // from the for(;;) loop
+				}
+			}
 
 		} else if (err != boost::asio::error::eof) {
 			std::cout << "Error: " << err << "\n";
@@ -126,7 +130,9 @@ private:
 };
 
 int main(int argc, char* argv[]) {
+
 	try {
+
 		if (argc != 3) {
 			std::cout << "Usage: async_client <server> <path>\n";
 			std::cout << "Example:\n";
