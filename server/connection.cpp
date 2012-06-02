@@ -76,6 +76,10 @@ void connection::handle_read( const boost::system::error_code& e, std::size_t by
 																	)
 													)
 									);
+
+
+			handle_read( e, bytes_transferred );
+
 		//}else
 		//	std::cerr << "ERRORE !!!" ;
 
