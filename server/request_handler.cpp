@@ -25,13 +25,5 @@ namespace http {
 		{
 		}
 
-		void request_handler::handle_request(const request& req, reply& rep)
-		{
-			rep = reply::stock_reply(reply::bad_request);
-
-		}
-
-
-
 	} // namespace server3
 } // namespace http

@@ -7,18 +7,21 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
+# include <sstream>
+
 
 #include "connection.hpp"
 #include <vector>
 #include <boost/bind.hpp>
 #include "request_handler.hpp"
 
+
+
 namespace http {
 namespace server3 {
 
-connection::connection(boost::asio::io_service& io_service,
-		request_handler& handler) :
-		strand_(io_service), socket_(io_service), request_handler_(handler) {
+connection::connection(boost::asio::io_service& io_service) :
+		strand_(io_service), socket_(io_service){
 }
 
 boost::asio::ip::tcp::socket& connection::socket() {
@@ -26,7 +29,12 @@ boost::asio::ip::tcp::socket& connection::socket() {
 }
 
 void connection::start() {
+
+
+	std::cout << "Reading ... !\n";
+
 	socket_.async_read_some(
+
 			boost::asio::buffer(buffer_),
 			strand_.wrap(
 							boost::bind (
@@ -35,44 +43,42 @@ void connection::start() {
 											boost::asio::placeholders::bytes_transferred
 										)
 						)
-							);
+			);
 }
 
 void connection::handle_read( const boost::system::error_code& e, std::size_t bytes_transferred ) {
 
 	if (!e) {
-		boost::tribool result;
-		boost::tie(result, boost::tuples::ignore) = request_parser_.parse(
-				request_, buffer_.data(), buffer_.data() + bytes_transferred);
 
-		if (result) {
-			request_handler_.handle_request(request_, reply_);
+		//boost::tribool result;
+
+		//boost::tie(result, boost::tuples::ignore) = request_parser_.parse(
+		//		request_, buffer_.data(), buffer_.data() + bytes_transferred);
+
+
+
+			std::stringstream prova;
+
+			std::cout << "Now received " <<  buffer_.data() << " !\n";
+
+			prova << buffer_.data() << buffer_.data();
+
+
+
 			boost::asio::async_write(
-					socket_,
-					reply_.to_buffers(),
-					strand_.wrap(
-							boost::bind(&connection::handle_write,
-									shared_from_this(),
-									boost::asio::placeholders::error)));
-		} else if (!result) {
-			reply_ = reply::stock_reply(reply::bad_request);
-			boost::asio::async_write(
-					socket_,
-					reply_.to_buffers(),
-					strand_.wrap(
-							boost::bind(&connection::handle_write,
-									shared_from_this(),
-									boost::asio::placeholders::error)));
-		} else {
-			socket_.async_read_some(
-					boost::asio::buffer(buffer_),
-					strand_.wrap(
-							boost::bind(
-									&connection::handle_read,
-									shared_from_this(),
-									boost::asio::placeholders::error,
-									boost::asio::placeholders::bytes_transferred)));
-		}
+										socket_,
+										boost::asio::buffer(prova.str()),
+										strand_.wrap(
+														boost::bind(
+																	&connection::handle_write,
+																	shared_from_this(),
+																	boost::asio::placeholders::error
+																	)
+													)
+									);
+		//}else
+		//	std::cerr << "ERRORE !!!" ;
+
 	}
 
 	// If an error occurs then no new asynchronous operations are started. This
