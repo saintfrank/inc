@@ -46,7 +46,7 @@ void connection::handle_read( const boost::system::error_code& e, std::size_t by
 
 			boost::asio::async_write(
 										socket_,
-										boost::asio::buffer(prova.str()),
+										boost::asio::buffer( prova.str() ),
 										strand_.wrap(
 														boost::bind(
 																	&connection::handle_write,
@@ -63,19 +63,32 @@ void connection::handle_read( const boost::system::error_code& e, std::size_t by
 
 void connection::handle_write(const boost::system::error_code& e) {
 
-	std::cout << "Reading ... \n";
+	if (e)
+		std::cerr << "ERRORE !!!!!!" ;
+	else
+	{
 
-	socket_.async_read_some(
 
-			boost::asio::buffer(buffer_),
-			strand_.wrap(
-							boost::bind (
-											&connection::handle_read, shared_from_this(),
-											boost::asio::placeholders::error,
-											boost::asio::placeholders::bytes_transferred
-										)
-						)
-			);
+		std::cout << "Reading, buffer... :" << buffer_.data()  << ":";
+
+
+		boost::array<char, 8192> newArray  = {{'\0'}};
+
+		buffer_ = newArray;
+
+		socket_.async_read_some(
+
+				boost::asio::buffer(buffer_),
+				strand_.wrap(
+								boost::bind (
+												&connection::handle_read, shared_from_this(),
+												boost::asio::placeholders::error,
+												boost::asio::placeholders::bytes_transferred
+											)
+							)
+				);
+
+	}
 }
 
 

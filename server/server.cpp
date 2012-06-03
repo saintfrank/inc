@@ -62,7 +62,9 @@ void server::run() {
 }
 
 void server::start_accept() {
+    
 	new_connection_.reset(new connection(io_service_));
+    
 	std::cout << "2 \n";
 
 	acceptor_.async_accept(
