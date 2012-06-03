@@ -3,7 +3,6 @@
 #include "connection.hpp"
 #include <vector>
 #include <boost/bind.hpp>
-#include "request_handler.hpp"
 
 
 namespace http {

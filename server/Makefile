@@ -16,8 +16,8 @@ all: $(programs)
 
 
 
-ftk_server: jsoncpp.o mime_types.cpp server.cpp connection.cpp    main.cpp  reply.cpp 
-	$(CCPP) $(CPP_FLAGS) $(CPP_LINK_OPT) mime_types.cpp server.cpp connection.cpp  main.cpp  reply.cpp   jsoncpp.o  -o server
+ftk_server: jsoncpp.o server.cpp connection.cpp  main.cpp  
+	$(CCPP) $(CPP_FLAGS) $(CPP_LINK_OPT) server.cpp connection.cpp  main.cpp jsoncpp.o  -o server
 
 ftk_client: jsoncpp.cpp client_a.cpp
 	$(CCPP) $(CPP_FLAGS) $(CPP_LINK_OPT)  jsoncpp.cpp client_s.cxx -o client
