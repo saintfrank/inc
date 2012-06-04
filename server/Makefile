@@ -9,21 +9,25 @@ CPP_LINK_OPT=   -lboost_system -lboost_thread -lboost_date_time
 # relative output for the Scala code
 SCALA_BUILD_PATH ?= build/
 
-programs = ftk_server ftk_client
+programs = server client
 
 
 all: $(programs)
 
+server: jsoncpp.o server.cpp connection.cpp main.cpp  
+	@printf "Compiling Server..."
+	@$(CCPP) $(CPP_FLAGS) $(CPP_LINK_OPT) server.cpp connection.cpp  main.cpp jsoncpp.o  -o server
+	@echo "OK."
 
-
-ftk_server: jsoncpp.o server.cpp connection.cpp  main.cpp  
-	$(CCPP) $(CPP_FLAGS) $(CPP_LINK_OPT) server.cpp connection.cpp  main.cpp jsoncpp.o  -o server
-
-ftk_client: jsoncpp.cpp client_a.cpp
-	$(CCPP) $(CPP_FLAGS) $(CPP_LINK_OPT)  jsoncpp.cpp client_s.cxx -o client
+client: jsoncpp.cpp client_a.cpp
+	@printf "Compiling Client..."
+	@$(CCPP) $(CPP_FLAGS) $(CPP_LINK_OPT)  jsoncpp.cpp client_s.cxx -o client
+	@echo "OK."
 
 jsoncpp.o: jsoncpp.cpp
-	$(CCPP) $(CPP_FLAGS) -c jsoncpp.cpp
+	@printf "Compiling Json..."
+	@$(CCPP) $(CPP_FLAGS) -c jsoncpp.cpp
+	@echo "OK"
 
 
 clean:
