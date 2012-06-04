@@ -4,6 +4,8 @@
 #include <vector>
 #include <boost/bind.hpp>
 
+#include <json/json.h>
+
 
 namespace http {
 namespace server3 {
@@ -42,10 +44,26 @@ void connection::handle_read( const boost::system::error_code& e, std::size_t by
 
 			std::cout << "Sending " <<  prova.str() << " !\n";
 
+			std::cout << "Received " <<  bytes_transferred << " !\n";
+
+			Json::Value response ;
+
+			response["1"] = buffer_.data();
+			response["2"] = buffer_.data();
+			response["3"] = buffer_.data();
+			response["4"] = buffer_.data();
+			response["5"] = buffer_.data();
+
+			std::cout << "\nSending response :" << response << " :\n";
+
+
+			Json::StyledWriter writer;
+
+			std::string ciao = writer.write( response );
 
 			boost::asio::async_write(
 										socket_,
-										boost::asio::buffer( prova.str() ),
+										boost::asio::buffer( ciao ),
 										strand_.wrap(
 														boost::bind(
 																	&connection::handle_write,
@@ -67,9 +85,7 @@ void connection::handle_write(const boost::system::error_code& e) {
 	else
 	{
 
-
 		std::cout << "Reading, buffer... :" << buffer_.data()  << ":";
-
 
 		boost::array<char, 8192> newArray  = {{'\0'}};
 
