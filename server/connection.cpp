@@ -44,7 +44,7 @@ void connection::handle_read( const boost::system::error_code& e, std::size_t by
 
 			Json::Value response ;
 
-			for (unsigned int i = 0 ; i < 1000 ; i++)
+			for (unsigned int i = 0 ; i < 2; i++)
 			{
 				std::stringstream ss ;
 				ss << i;
