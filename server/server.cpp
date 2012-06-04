@@ -1,18 +1,10 @@
-//
-// server.cpp
-// ~~~~~~~~~~
-//
-// Copyright (c) 2003-2012 Christopher M. Kohlhoff (chris at kohlhoff dot com)
-//
-// Distributed under the Boost Software License, Version 1.0. (See accompanying
-// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-//
-
 #include "server.hpp"
 #include <boost/thread/thread.hpp>
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <vector>
+
+#define DEBUG_SOCKET
 
 namespace http {
 namespace server3 {
@@ -25,9 +17,11 @@ server::server(const std::string& address, const std::string& port, std::size_t 
 	// provided all registration for the specified signal is made through Asio.
 	signals_.add(SIGINT);
 	signals_.add(SIGTERM);
-#if defined(SIGQUIT)
-	signals_.add(SIGQUIT);
-#endif // defined(SIGQUIT)
+
+	#if defined(SIGQUIT)
+		signals_.add(SIGQUIT);
+	#endif // defined(SIGQUIT)
+
 	signals_.async_wait(boost::bind(&server::handle_stop, this));
 
 	// Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
@@ -39,20 +33,23 @@ server::server(const std::string& address, const std::string& port, std::size_t 
 	acceptor_.bind(endpoint);
 	acceptor_.listen();
 
-	std::cout << "1 \n";
-
 	start_accept();
 }
 
 void server::run() {
 	// Create a pool of threads to run all of the io_services.
 	std::vector < boost::shared_ptr<boost::thread> > threads;
+
 	for (std::size_t i = 0; i < thread_pool_size_; ++i) {
-		boost::shared_ptr < boost::thread
-				> thread(
-						new boost::thread(
-								boost::bind(&boost::asio::io_service::run,
-										&io_service_)));
+
+		boost::shared_ptr < boost::thread > thread(
+													new boost::thread(
+																		boost::bind(
+																				&boost::asio::io_service::run,
+																				&io_service_)
+																	 )
+												  );
+
 		threads.push_back(thread);
 	}
 
@@ -64,30 +61,36 @@ void server::run() {
 void server::start_accept() {
     
 	new_connection_.reset(new connection(io_service_));
-    
-	std::cout << "2 \n";
+
+	#ifdef DEBUG_SOCKET
+		std::cout << "\n---- Waiting for connections ----" << std::endl;
+	#endif
 
 	acceptor_.async_accept(
-			new_connection_->socket(),
-			boost::bind(&server::handle_accept, this,
-					boost::asio::placeholders::error));
+							new_connection_->socket(),
+							boost::bind(
+										&server::handle_accept,
+										this,
+										boost::asio::placeholders::error
+										)
+							);
 
-	std::cout << "3 \n";
 }
 
 void server::handle_accept(const boost::system::error_code& e) {
 
-	if (!e) {
+	if (!e)
+	{
 		new_connection_->start();
 	}
-
-	std::cout << "4 \n";
 
 	start_accept();
 }
 
 void server::handle_stop() {
+
 	io_service_.stop();
+
 }
 
 } // namespace server3

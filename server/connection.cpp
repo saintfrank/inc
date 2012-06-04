@@ -1,4 +1,3 @@
-
 # include <sstream>
 #include "connection.hpp"
 #include <vector>
@@ -15,9 +14,6 @@ connection::connection( boost::asio::io_service& io_service ) : strand_(io_servi
 boost::asio::ip::tcp::socket& connection::socket() { return socket_; }
 
 void connection::start() {
-
-
-	std::cout << "Reading ... \n";
 
 	socket_.async_read_some(
 
@@ -48,18 +44,21 @@ void connection::handle_read( const boost::system::error_code& e, std::size_t by
 
 			Json::Value response ;
 
-			response["1"] = buffer_.data();
-			response["2"] = buffer_.data();
-			response["3"] = buffer_.data();
-			response["4"] = buffer_.data();
-			response["5"] = buffer_.data();
+			for (unsigned int i = 0 ; i < 1000 ; i++)
+			{
+				std::stringstream ss ;
+				ss << i;
+				response[ss.str()] = buffer_.data();
+			}
 
-			std::cout << "\nSending response :" << response << " :\n";
-
+			//std::cout << "\nSending response :" << response << " :\n";
 
 			Json::StyledWriter writer;
 
 			std::string ciao = writer.write( response );
+
+			std::cout << "\nSending  :" << ciao.size() << " bytes :\n";
+
 
 			boost::asio::async_write(
 										socket_,
