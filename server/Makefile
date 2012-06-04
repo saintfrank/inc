@@ -6,8 +6,6 @@ CCPP=clang++
 CPP_FLAGS= -I/Users/showandtell/boost_1_49_0 -I../includes -DJSON_IS_AMALGAMATION -g
 CPP_LINK_OPT=   -lboost_system -lboost_thread -lboost_date_time 
 
-# relative output for the Scala code
-SCALA_BUILD_PATH ?= build/
 
 programs = server client
 
@@ -19,9 +17,9 @@ server: jsoncpp.o server.cpp connection.cpp main.cpp
 	@$(CCPP) $(CPP_FLAGS) $(CPP_LINK_OPT) server.cpp connection.cpp  main.cpp jsoncpp.o  -o server
 	@echo "OK."
 
-client: jsoncpp.cpp client_a.cpp
+client: jsoncpp.cpp client_s.cpp
 	@printf "Compiling Client..."
-	@$(CCPP) $(CPP_FLAGS) $(CPP_LINK_OPT)  jsoncpp.cpp client_s.cxx -o client
+	@$(CCPP) $(CPP_FLAGS) $(CPP_LINK_OPT)  jsoncpp.cpp client_s.cpp -o client
 	@echo "OK."
 
 jsoncpp.o: jsoncpp.cpp
