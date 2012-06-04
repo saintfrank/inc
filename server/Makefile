@@ -17,9 +17,9 @@ server: jsoncpp.o server.cpp connection.cpp main.cpp
 	@$(CCPP) $(CPP_FLAGS) $(CPP_LINK_OPT) server.cpp connection.cpp  main.cpp jsoncpp.o  -o server
 	@echo "OK."
 
-client: jsoncpp.cpp client_s.cpp
+client: jsoncpp.cpp client.cpp
 	@printf "Compiling Client..."
-	@$(CCPP) $(CPP_FLAGS) $(CPP_LINK_OPT)  jsoncpp.cpp client_s.cpp -o client
+	@$(CCPP) $(CPP_FLAGS) $(CPP_LINK_OPT)  jsoncpp.cpp client.cpp -o client
 	@echo "OK."
 
 jsoncpp.o: jsoncpp.cpp
