@@ -1,1 +1,7 @@
 Client/Server Application
+
+
+
+TODO : 
+- Handle excetion on run-time missing server
+- Fix server's code (domment and aesthetics)
