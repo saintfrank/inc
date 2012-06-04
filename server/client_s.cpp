@@ -1,13 +1,3 @@
-//
-// sync_client.cpp
-// ~~~~~~~~~~~~~~~
-//
-// Copyright (c) 2003-2012 Christopher M. Kohlhoff (chris at kohlhoff dot com)
-//
-// Distributed under the Boost Software License, Version 1.0. (See accompanying
-// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-//
-
 #include <iostream>
 #include <istream>
 #include <ostream>
@@ -15,7 +5,7 @@
 #include <boost/asio.hpp>
 #include <json/json.h>
 
-#define DEBUG_SOCKET
+//#define DEBUG_SOCKET
 
 #define MAXBUF 4096
 
@@ -31,10 +21,8 @@ int main(int argc, char* argv[]) {
 			return 1;
 		}
 
-
+		// Asio Objects
 		boost::asio::io_service io_service;
-
-		// Get a list of endpoints corresponding to the server name.
 		tcp::resolver	resolver(io_service);
 		tcp::socket		socket  (io_service);
 
@@ -72,9 +60,9 @@ int main(int argc, char* argv[]) {
 		while (true)
 		{
 
-			////////////////////////////////////////////
-			///////
 
+			////////////////////       Reading line and sending the command through the socket
+			//
 			std::cout << "> " ;
 			std::getline ( std::cin, myInput);
 
@@ -95,16 +83,22 @@ int main(int argc, char* argv[]) {
 
 			if (myWriteError)
 			{
-				std::cout << "---------- error : found error writing socket ------------ \n\n";
+				std::cerr << "\n---------- error : found error writing socket ------------ \n\n";
 				return 0;
 			}
+			//
+			//////////////////// 	End of Line Read and write
 
-			// waiting for messages
+
+
+
+			////////////////////       Reading Response from socket
+			//
 			std::string readed_string;
 
 			boost::system::error_code myReadError;
 
-			do{
+			do{ // Reading loop. Performed until the socket will be entirely red.
 
 				// resetting the counter
 				readed = 0;
@@ -112,7 +106,6 @@ int main(int argc, char* argv[]) {
 				boost::array<char, MAXBUF> myBuf = {{' '}};
 
 				readed = socket.read_some(boost::asio::buffer(myBuf, MAXBUF));
-				//readed = socket.read_some( boost::asio::buffer(myBuf), myReadError );
 
 				if ( readed > 0 )
 					readed_string.append( std::string(myBuf.data()) );
@@ -121,9 +114,15 @@ int main(int argc, char* argv[]) {
 					std::cerr << "Received "<< readed << " bytes, still" << socket.available() << " to go" << "\n" << std::endl;
 				#endif
 
-			} while ( socket.available() > 0 );  // If there are other information to read
+			} while ( socket.available() > 0 );  // If there are other information to read we iterate
+			//
+			//////////////////// 	End of read from socket
 
 
+
+
+			////////////////////    Composing the Json responde from the received data.
+			//
 			std::stringstream myStream (readed_string);
 
 			Json::Value root;   // will contain the root value after parsing.
@@ -140,8 +139,10 @@ int main(int argc, char* argv[]) {
 
 			// Printing the result
 			std::cout << root;
+			//
+			/////////////////////    End of composing Json
 
 		} // End of Routine while loop
 
-	return 0;
+		return 0;
 }
