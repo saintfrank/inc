@@ -12,9 +12,9 @@ programs = server client
 
 all: $(programs)
 
-server: jsoncpp.o server.cpp connection.cpp main.cpp  
+server: jsoncpp.o server.cpp connection.cpp  
 	@printf "Compiling Server..."
-	@$(CCPP) $(CPP_FLAGS) $(CPP_LINK_OPT) server.cpp connection.cpp  main.cpp jsoncpp.o  -o server
+	@$(CCPP) $(CPP_FLAGS) $(CPP_LINK_OPT) server.cpp connection.cpp  jsoncpp.o  -o server
 	@echo "OK."
 
 client: jsoncpp.cpp client.cpp
