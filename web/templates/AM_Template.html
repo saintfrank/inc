@@ -1,0 +1,505 @@
+$def with (hname, text)
+
+<!doctype html>
+
+<html>
+
+    <head>
+        
+        <link rel="icon" href="/static/favicon.gif" type="image/gif" />
+        
+        <title>FTK Monitorning</title>
+        <link rel="stylesheet" type="text/css" href="/static/ftkMonitoring.css" />
+		<link rel="stylesheet" type="text/css" href="/static/tip.css" />
+        <link type="text/css" href="/static/css/ui-lightness/jquery-ui-1.8.13.custom.css" rel="Stylesheet" />	
+		
+        <!-- Now adding the JS files -->
+		<script type="text/javascript" src="/static/js/jquery-1.5.1.min.js"></script>
+		<script type="text/javascript" src="/static/js/jquery-ui-1.8.13.custom.min.js"></script>
+        <script type="text/javascript" src="/static/jtip.js"></script>
+        <script type="text/javascript">
+
+	function myParserJSON( result, isMonitor ){
+	
+		try
+		{
+
+			var myObject = JSON.parse(result);
+			return myParserObject( myObject, isMonitor );
+
+		}
+		catch(e)
+		{
+			//era gia un oggetto. meglio. allora mi faccio un piccolo parsinf tutto mio
+			return myParserObject( result, isMonitor );
+		}
+		
+
+  	};
+        
+    // recursive function pretty-printing an Object containing the results     
+    function myParserObject( result, isMonitor ){
+			
+		//object parser
+			
+		if( jQuery.isArray(result) )
+		{
+			var myStringTotal = "";
+
+			for( var i = 0; i < result.length; i++ )
+			{
+				var elementString = "" ;	
+				
+				elementString = myParserObject( result[i], isMonitor );
+				
+				if(isMonitor)
+				{
+					myStringTotal = myStringTotal + '<div class = "padded-left-monitor">' + elementString + '</div>';
+				}
+				else
+				{
+					myStringTotal = myStringTotal + '<div class = "padded-left">' + elementString + '</div>';
+				}
+			}
+			
+			return myStringTotal;
+				
+		}
+		else if( typeof result == "object" )
+		{
+			var myStringTotal = "";
+
+			for( var key in result )
+			{
+			    var value = result[key];
+			    
+				var elementString = "" ;	
+				
+								
+				elementString = myParserObject( value, isMonitor );
+				
+				
+				if(isMonitor)
+				{
+					myStringTotal = myStringTotal + '<div class = "padded-left-monitor">' +  '<p>' + '<h3>' + key + '</h3>' +'</p>'  + elementString + '</div>';
+				}
+				else
+				{
+					myStringTotal = myStringTotal + '<div class = "padded-left">' +  '<p>' + '<h3>' + key + '</h3>' +'</p>'  + elementString + '</div>';
+				}
+			
+			}
+			
+			return myStringTotal;
+				
+		}
+		else //else if( typeof result == "string" )
+		{
+			if(isMonitor)
+			{
+				return  '<div class = "padded-left-monitor">' + '<p>' + result + '</p>' + '</div>';
+			}
+			else
+			{
+				return  '<div class = "padded-left">' + '<p>' + result + '</p>' + '</div>';
+			}
+		}
+		
+		
+		return stringa;
+
+  	};  
+  	
+  	jQuery(function() {
+		jQuery( '.accordion' ).accordion({collapsible:true,active:false, autoHeight: false, header:'h1'});
+		});  
+  
+   
+	function updateTips( t ) {
+			tips
+				.text( t )
+				.addClass( "ui-state-highlight" );
+			setTimeout(function() {
+				tips.removeClass( "ui-state-highlight", 1500 );
+			}, 500 );
+		}
+
+	function checkLength( o, n, min, max ) {
+			if ( o.val().length > max || o.val().length < min ) 
+			{
+				o.addClass( "ui-state-error" );
+				updateTips( "Length of " + n + " must be between " +
+					min + " and " + max + "." );
+				return false;
+			} 
+			else 
+			{
+				return true;
+			}
+		}
+
+		function checkRegexp( o, regexp, n ) {
+			if ( !( regexp.test( o.val() ) ) ) 
+			{
+				o.addClass( "ui-state-error" );
+				updateTips( n );
+				return false;
+			} 
+			else 
+			{
+				return true;
+			}
+		}
+
+	        
+	jQuery(function() 
+	{
+		
+		var name_mon = jQuery( "#nameForm" ),
+			name_mon_remove = jQuery( "#nameFormRemove" ),
+			command_mon = jQuery( "#commandForm" ),
+			interval_mon = jQuery( "#intervalForm" ),
+			allFields = jQuery( [] ).add( name_mon ).add( command_mon ).add( interval_mon ),
+			tips = jQuery( ".validateTips" );
+			
+		var	myResponse = jQuery("#response-panel"); 
+		var contextWindow = jQuery("#context-panel");
+		var loginWindow = jQuery("#login-panel");
+		
+		// This line disables the "ENTER" command
+		jQuery('input').keypress(function (event){ return event.keyCode == 13 ? false : true; });                    
+        
+		
+		////////////////////////////////////////////////////////////////////
+		///// Monitor Collection Object 
+		////////////////////////////////////////////////////////////////////
+		
+		function monitors()
+		{
+			this.monitors=[];
+			this.add_mon = function( newMonitor ){ 
+			
+			newMonitor.update_link[0].onclick = function(){
+			
+			   newMonitor.update_me();
+			};
+			
+			this.monitors.push( newMonitor );  
+			
+			};
+			this.remove_mon = function( remMonitor ){ 
+		
+			for( key in this.monitors)
+			{
+				if (this.monitors[key].name == remMonitor)
+				{
+					//remove the element
+					this.monitors.splice(key,1) ;
+					return;
+				}	 	
+			}
+						
+			};
+					
+			this.publish = function( paramDiv ) 
+			{ 
+				paramDiv.empty(); // I empty it first
+				jQuery.each( 
+							this.monitors, 
+							function(key, value) { 
+								paramDiv.append( value.getAccordionObject() );
+								} 
+							);
+				
+			};
+			
+		}
+		
+		///////////////////////////////////////////////////
+		//////    The monitor Object
+		///////////////////////////////////////////////////
+		
+		
+		function monitor(name,command,interval)
+		{
+		
+			this.name = name ;	
+			this.command = command ;
+			this.interval = interval ;
+			this.element_name='#'+name;
+			this.valore = 0;
+						
+			this.content_panel = jQuery('<div/>', { "class" : "monitor_content", "id" : command  });
+					
+			this.update_monitor = function ( mon, val, set_timer )
+							{
+							var answer = 'No connecntion to Server'	;
+							 							
+							//here calling the ajax function 
+							var data_in = {};
+							data_in['command'] = mon.command;
+							jQuery.ajax({
+								type: "POST",
+								data: data_in,
+								url: "/command",
+								dataType: "json" ,
+								success: function(data) {
+										var cross;
+										
+										// making the o move to show the monitoring is refreshing
+										switch( val % 5 )
+										{
+											case 0:
+  												cross= '';
+  											    break;
+  											case 1:
+  												cross= '|';
+  											    break;
+  											case 2:
+  												cross= '||';
+  											    break;
+  											case 3:
+  												cross= '|||';
+  											    break;
+  											case 4:
+  												cross= '||||';
+  											    break;  										
+  						
+  											default:
+  											    cross= 'error in sync';
+  											    break;
+  										}									
+									  
+										answer = myParserJSON(data, true);   
+										
+										mon.content_panel.empty().append( jQuery('<div/>').html('<p>' + answer +' </p>').html() ).append(mon.update_link).append( '<span style="font-size : 8pt;">' + cross + '</span>');		
+										var newVal = val +1;
+										
+										if(set_timer)
+										{
+											//window.setTimeout( function(){ mon.update_monitor(mon, newVal, true); } , mon.interval );
+										}
+								},
+								error: function(xhr) {
+									
+									answer = ('Error. Received unrecognizable data ' );
+								
+									mon.content_panel.empty().append( jQuery('<div/>').html('<p>' + answer +' </p>').html() );
+							
+								}
+							});
+																											
+							};
+			
+			this.update_link_list = jQuery('<a/>', { "class" : "up_link", text : " refresh now  ", id : this.name }).css("color","#990000").css("font-size","9pt");
+			
+			this.update_link = this.update_link_list;
+			
+			this.update_me = function(){
+				this.update_monitor(this,0, false);
+			}			
+			
+			this.update_link.click( this.update_me );							
+										
+			this.title = jQuery('<h1/>').append( jQuery('<a/>',{ "href" : "#", text: name }) ) ;
+			
+			this.accordion = jQuery('<div/>', {	"class" : "accordion" })
+					.append(this.title)
+					.append(this.content_panel.append(this.update_link) );
+								
+			this.getAccordionObject = function() { return this.accordion ;};
+			
+			this.update_monitor(this ,  0, true);				
+			
+		} 
+    
+		
+		// Creating the default monitors
+		var crateMon= new monitor('Crate','getstatus * * ;', 10000);
+		var monMon= new monitor('Monitors','monitors ;', 10000);
+				
+		var myMonitors = new monitors();
+		
+		myMonitors.add_mon(crateMon);
+		myMonitors.add_mon(monMon);
+				
+		myMonitors.publish( jQuery("#monitors") );
+		
+		////////////////////////////////////////////////////
+		//////   The Add monitor dialog form
+		////////////////////////////////////////////////////
+				
+		jQuery( "#dialog-form" ).dialog({
+			autoOpen: false,
+			height: 300,
+			width: 350,
+			modal: true,
+			buttons: {
+				"Add Monitor": function() {
+					var bValid = true;
+					allFields.removeClass( "ui-state-error" );
+
+					if ( bValid ) {
+						var newMonitor = new monitor( name_mon.val(), command_mon.val(), interval_mon.val() );
+						myMonitors.add_mon(newMonitor);
+						
+						myMonitors.publish( jQuery("#monitors") );
+						jQuery('.accordion').accordion({collapsible:true,active:false, autoHeight: false, header:'h1'});
+								
+						jQuery( this ).dialog( "close" );
+					}
+				},
+				Cancel: function() {
+					jQuery( this ).dialog( "close" );
+				}
+			},
+			close: function() {
+				allFields.val( "" ).removeClass( "ui-state-error" );
+			}
+		});
+		
+		////////////////////////////////////////////////////
+		//////   The Remove monitor dialog form
+		////////////////////////////////////////////////////
+			
+		jQuery( "#dialog-form-remove" ).dialog({
+			autoOpen: false,
+			height: 300,
+			width: 350,
+			modal: true,
+			buttons: {
+				"Remove Monitor": function() {
+					var bValid = true;
+					allFields.removeClass( "ui-state-error" );
+
+					if ( bValid ) {
+						
+						myMonitors.remove_mon( name_mon_remove.val() );
+						
+						myMonitors.publish( jQuery("#monitors") );
+						jQuery('.accordion').accordion({collapsible:true,active:false, autoHeight: false, header:'h1'});
+								
+						jQuery( this ).dialog( "close" );
+					}
+				},
+				Cancel: function() {
+					jQuery( this ).dialog( "close" );
+				}
+			},
+			close: function() {
+				allFields.val( "" ).removeClass( "ui-state-error" );
+			}
+		});
+	
+			
+		jQuery( "#addMonitor" ).click(function() {
+				jQuery( "#dialog-form" ).dialog( "open" );
+			});
+			
+		jQuery( "#removeMonitor" ).click(function() {
+				jQuery( "#dialog-form-remove" ).dialog( "open" );
+			});
+		
+		jQuery('.accordion').accordion({collapsible:true,active:false, autoHeight: false, header:'h1'});
+			
+		function sendcommand()
+		{
+                	var input_string = jQuery("#commandform").find( 'input[name="commandline"]' ).val();
+                	var data_in = {};
+					data_in['command'] = input_string;     
+					jQuery.ajax({
+                        	type: "POST",
+                            data: data_in,
+                            url: "/command",
+                            dataType: "json" ,
+							success: function(data) {
+								//alert('Received error: ' + data['error']);
+								var prova = myParserJSON(data, false);     							
+								myResponse.html(prova);
+                            },
+                            error: function(xhr) {
+								myResponse.html( 'Received Error from Server');
+							}
+                        });
+									
+                	return true;
+		}	
+				
+		jQuery("#execute").click(sendcommand);
+ 
+  
+                                        
+        });
+          
+          
+        
+    </script>
+    </head>
+      <body>
+
+        <br class="clear" /><br /><br />
+        <div id="content">
+            <h1 class="pagehead"> FTK <span class="monitoring">MONITORING</span> <span class="running"> <span class="runningat">running at</span> <span class="hostname">$hname</span> </span> </h1>
+            <div class="description">
+				
+				<div id="monitors-panel">
+					<div id="monitors">
+					</div><!-- monitors -->
+				
+					<div id="Monitor-add-remove-panel">
+					<a id="addMonitor">add monitor</a>
+					<span class="formInfo"><a href="static/ajax5.htm" class="jTip" id="two" name="The Command form">?</a></span><br>
+					<a id="removeMonitor">remove monitor</a>
+					<span class="formInfo"><a href="static/ajax5.htm" class="jTip" id="three" name="The Command form">?</a></span><br><br><br>
+					<a id="documentation" rel="external" href="static/doc/html/index.html">Consult Documentation</a>
+					
+					</div><!-- monitor-add-remove-panel -->
+				
+					<div id="dialog-form" title="Create new monitor">
+					<p class="validateTips">All form fields are required.</p>
+					<form>
+					<fieldset>
+					<label for="nameForm">Name</label>
+					<input type="text" name="name" id="nameForm" class="text ui-widget-content ui-corner-all" />
+					<label for="commandForm">Command</label>
+					<input type="text" name="name" id="commandForm" class="text ui-widget-content ui-corner-all" />
+					<label for="intervalForm">Interval</label>
+					<input type="text" name="name" id="intervalForm" class="text ui-widget-content ui-corner-all" />
+					</fieldset>
+					</form>
+					</div>
+					
+					<div id="dialog-form-remove" title="Remove monitor">
+					<p class="validateTips">Insert name </p>
+					<form>
+					<fieldset>
+					<label for="nameFormRemove">Name</label>
+					<input type="text" name="name" id="nameFormRemove" class="text ui-widget-content ui-corner-all" />
+					</fieldset>
+					</form>
+					</div>
+
+				</div><!-- monitors-panel -->
+				
+				<div class="comando">    
+					<div class="commandline">    
+					<form id="commandform"> 
+					<span class="formInfo"><a href="static/ajax3.htm" class="jTip" id="one" name="The Command form">?</a></span>
+					<input type="text" name="commandline" />
+					<span class="execute_span"><a id="execute">EXECUTE</a></span>
+					</form>
+					</div><!-- /comandline -->    
+					
+					<div class="response" id= "response-panel">    
+					<!---$text-->			
+					</div><!-- /response -->    
+				</div><!-- /comando -->
+			</div><!-- /description -->
+        </div><!-- /content -->
+
+
+        <div id="footer">
+            <a href="http://atlas.pi.infn.it/" title="Creator">ATLAS PISA</a>
+        </div><!-- /footer -->
+    </body>
+</html>

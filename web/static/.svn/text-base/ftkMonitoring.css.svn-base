@@ -1,0 +1,286 @@
+*, html{
+    margin: 0px;
+    padding: 0px;
+}
+h1, h2, h4, h5, h6{
+    font-family: "Helvetica";
+    font-weight: normal;
+    color: #2a2a2a;
+    margin: 0 0 5px 0;
+    padding: 0px;
+}
+
+h3{
+    font-family: "Helvetica";
+    font-weight: normal;
+    font-size: 9pt;
+    color: #FF6600;
+    margin: 0 0 5px 0;
+    padding: 0px;
+}
+
+span.runningat {
+	color:#666666;
+	font: normal 8pt Helvetica;
+}
+span.running {
+	float : right;
+}
+span.hostname {
+	color:#cc6633;
+	font: normal 12pt Helvetica;
+}
+
+span.monitoring {
+	color:#cc0000;
+	font: normal 12pt Helvetica;
+}
+
+div.boxed{
+	width: 1000 px;
+	height : 1000 px;
+	padding: 5px 5px 5px 5px;
+    font: normal 16pt Helvetica;
+
+}
+
+.pagehead{
+    margin: 0px 0 0px 0;
+    padding: 15px 40% 10px 10px;
+    background: #f3f3f3;
+    color:#660000;
+    font: bold 30pt Helvetica;
+	border-bottom: 1px solid #e8e8e8;
+}
+.description{
+    padding: 10px;
+}
+p{
+    margin: 0 0 10px 0;
+}
+body{
+    background: #f8f8f8;
+    color: #454545;
+    font: normal 10pt Helvetica;
+    margin: 0;
+    padding: 0;
+    border-top: 12px solid #2a2a2a;
+}
+a:focus{
+    border: none;
+    outline: none;
+}
+a{
+    color: #1e7dc6;
+    text-decoration: none;
+    cursor: pointer;
+}
+a:hover{
+    color: #c67d1e;
+}
+#content{
+    width: 980px;
+    margin: 0 auto;
+    height:100%;
+    min-height: 1000px;
+    background: #FFF;
+    padding: 0px 0px 10px 0px;
+    border: 1px solid #e8e8e8;
+    line-height: 1.5;
+}
+
+.comando{
+    width: 702px;
+    margin: 10 auto;
+    background: #FFF;
+    padding: 0px 0px 0px 0px;
+    border: 2px solid #e8e8e8;
+    border-radius: 2px 2px 2px 2px;
+    line-height: 1.5;
+}
+
+.commandline{
+    height : 10xp;
+    margin: 10 auto;
+    background: #515151;
+    padding: 5px 5px 5px 5px;
+    border-radius: 2px 2px 2px 2px ;
+    line-height: 1.5;
+}
+
+.response{
+    width: 696px;
+    margin: 10 auto;
+    padding: 30px 0px 0px 0px;
+    line-height: 1.5;
+}
+
+#execute{
+   font: normal 10pt Monaco;
+   color: #FFFFFF;
+}
+
+#footer{
+    width: 980px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 10px 0 20px 0;
+}
+.clear{
+    clear:both;
+}
+
+
+.form	{
+		display: block; 
+		position: relative; 
+		margin-left: 0px; 
+		margin-right: auto; 
+		width: 700px;
+	}
+	
+	
+.button {
+		position: absolute;
+		top: 10%;
+		right: 60%;
+		cursor: pointer;
+		}	
+	
+input {
+height: 24px;
+width: 590px;
+background-color: <page background color>
+}
+
+#monitors-panel{  
+  float: right;
+  padding:0;margin:0;
+  width: 250px;
+  height: inherit;
+  clear:both;
+  margin-right:0px;
+}
+
+#Monitor-add-remove-panel{
+	padding : 5px 5px 0px 0px;
+	text-align:right;
+	font-size: 9pt;
+}
+
+.monitor_content{
+	padding: 0 0 0 0;
+	border : 0 0 0 0;
+	margin : 0 0 0 0;
+}
+
+.same{  
+	display:inline;
+}
+
+
+div.padded-left{  
+       padding-top: 0px;  
+       padding-right: 0px;  
+       padding-bottom: 0px;  
+       padding-left: 20px;  
+}
+
+
+div.padded-left-monitor{  
+       padding-top: 0px;  
+       padding-right: 0px;  
+       padding-bottom: 0px;  
+       padding-left: 4px;  
+}
+
+div.padded-up {  
+       padding-top: 0px;  
+       padding-right: 0px;  
+       padding-bottom: 0px;  
+       padding-left: 0px;  
+}   
+
+/***  Questi erano nel Template, per le sbarre adestra   ****/
+
+#demo-header{
+    width: 970px;
+    margin: 0 auto;
+    position: relative;
+}
+#login-link{
+    position: absolute;
+    top: 40px;
+    right: 15px;
+    display: block;
+    background: #2a2a2a;
+    padding: 5px 15px 5px 15px;
+    color: #FFF;
+}
+
+#help-slot-link{
+    position: absolute;
+    top: 40px;
+    right: 0px;
+    display: block;
+    background: #2a2a2a;
+    padding: 5px 5px 5px 5px;
+    color: #FF0000;
+}
+#login-panel{
+    position: absolute;
+    top: 68px;
+    right: 0px;
+    width: 190px;
+    padding: 10px 15px 5px 15px;
+    background: #2a2a2a;
+    font-size: 8pt;
+    font-weight: bold;
+    color: #FFF;
+    display: none;
+}
+
+#context-header{
+    width: 970px;
+    margin: 0 auto;
+    position: relative;
+}
+
+#help-context-link{
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    display: block;
+    background: #2a2a2a;
+    padding: 5px 5px 5px 5px;
+    color: #FF0000;
+}
+
+#context-link{
+    position: absolute;
+    top: 0px;
+    right: 15px;
+    display: block;
+    background: #2a2a2a;
+    padding: 5px 15px 5px 15px;
+    color: #FFF;
+}
+#context-panel{
+    position: absolute;
+    top: 0px;
+    right: 85px;
+    width: 190px;
+    padding: 10px 15px 5px 15px;
+    background: #2a2a2a;
+    font-size: 8pt;
+    font-weight: bold;
+    color: #FFF;
+    display: none;
+}
+input.text { margin-bottom:12px; width:95%; padding: .4em; }
+fieldset { padding:0; border:0; margin-top:25px; }
+.ui-dialog .ui-state-error { padding: .3em; }
+.validateTips { border: 1px solid transparent; padding: 0.3em; }
+
+		
+		
