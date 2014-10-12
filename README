@@ -1,1 +1,13 @@
+
+
+A Command Line Interface RPC client and server using tcp sockets. 
+
+C++ and Boost.
+
+
+The client might be in the same machine or as well in the network.
+
+
 Client/Server Application
+
+

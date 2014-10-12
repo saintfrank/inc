@@ -24,7 +24,6 @@ int main()
 
     boost::thread runningRemoteConnector(server);
 
-      
     //join 
     runningRemoteConnector.join();
     
